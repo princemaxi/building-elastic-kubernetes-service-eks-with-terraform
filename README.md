@@ -725,7 +725,7 @@ kubectl get svc
 
 ### 🔐 3.6 Retrieve Admin Password
 ```bash
-kubectl exec -it svc/jenkins -c jenkins -- cat /run/secrets/chart-admin-password
+kubectl exec -it svc/jenkins -c jenkins -- cat /run/secrets/additional/chart-admin-password
 ```
 
 ### 🌐 3.7 Access Jenkins UI
