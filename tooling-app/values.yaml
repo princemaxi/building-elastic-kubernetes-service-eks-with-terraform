@@ -2,7 +2,7 @@ replicaCount: 3
 
 image:
   repository: princemaxi/tooling-app
-  tag: "1.1.0"
+  tag: "1.0"
   pullPolicy: IfNotPresent
 
 service:
