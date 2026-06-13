@@ -1,7 +1,5 @@
-# Fetch cluster details using your exact cluster name
-data "aws_eks_cluster" "eks" {
-  name = "tooling-app-eks"
-}
+# Make sure you still have this data block somewhere to get your AWS account ID!
+# data "aws_caller_identity" "current" {}
 
 # 1. Create the IAM Role for the CSI Driver
 resource "aws_iam_role" "ebs_csi_driver_role" {
@@ -14,12 +12,14 @@ resource "aws_iam_role" "ebs_csi_driver_role" {
       {
         Effect = "Allow"
         Principal = {
-          Federated = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:oidc-provider/${replace(data.aws_eks_cluster.eks.identity[0].oidc[0].issuer, "https://", "")}"
+          # References the OIDC output directly from your EKS module
+          Federated = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:oidc-provider/${replace(module.eks.cluster_oidc_issuer_url, "https://", "")}"
         }
         Action = "sts:AssumeRoleWithWebIdentity"
         Condition = {
           StringEquals = {
-            "${replace(data.aws_eks_cluster.eks.identity[0].oidc[0].issuer, "https://", "")}:sub" = "system:serviceaccount:kube-system:ebs-csi-controller-sa"
+            # References the OIDC output directly from your EKS module
+            "${replace(module.eks.cluster_oidc_issuer_url, "https://", "")}:sub" = "system:serviceaccount:kube-system:ebs-csi-controller-sa"
           }
         }
       }
@@ -35,10 +35,11 @@ resource "aws_iam_role_policy_attachment" "ebs_csi_driver_policy_attachment" {
 
 # 3. Finally, install the EKS Add-on using the role we just created
 resource "aws_eks_addon" "ebs_csi_driver" {
-  cluster_name             = "tooling-app-eks"
+  # This implicit dependency tells Terraform to wait for the module to finish!
+  cluster_name             = module.eks.cluster_name
   addon_name               = "aws-ebs-csi-driver"
   service_account_role_arn = aws_iam_role.ebs_csi_driver_role.arn
-  
+
   # Ensure the role and policy exist before trying to create the addon
   depends_on = [
     aws_iam_role_policy_attachment.ebs_csi_driver_policy_attachment

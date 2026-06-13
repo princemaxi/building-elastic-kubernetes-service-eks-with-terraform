@@ -1,0 +1,28 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: artifactory-ingress
+  namespace: tools
+  annotations:
+    nginx.ingress.kubernetes.io/proxy-body-size: 500m
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    cert-manager.io/private-key-rotation-policy: Always
+  labels:
+    name: artifactory
+spec:
+  ingressClassName: nginx
+  tls:
+  - hosts:
+    - artifactory.qyonlimited.com
+    secretName: artifactory.qyonlimited.com
+  rules:
+  - host: artifactory.qyonlimited.com
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: artifactory
+            port:
+              number: 8082
