@@ -93,6 +93,9 @@ Certificate issued → stored as Kubernetes TLS Secret
 Nginx Ingress serves the certificate
 ```
 
+![alt text](/images3/01.jpg)
+![alt text](/images3/02.jpg)
+
 **cert-manager components:**
 
 | Component | Role |
@@ -737,6 +740,9 @@ kubectl apply -f letsencrypt-issuer.yaml
 | IAM required | No | Yes |
 | Reliability on EKS | Moderate | High |
 | Survives cluster rebuild | No | Yes (IAM role persists) |
+
+![alt text](/images3/03.jpg)
+
 
 ### Why IRSA over static credentials?
 
